@@ -1,0 +1,35 @@
+name: chambi_frontend
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  provider: ^6.1.1
+
+  # Navigation
+  go_router: ^13.2.0
+
+  # Google Sign-In (mock for now, wire to Firebase later)
+  google_sign_in: ^6.2.1
+
+  # Image picking (for tasker registration - portfolio, profile photo)
+  image_picker: ^1.0.7
+
+  # Icons
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: false
+
