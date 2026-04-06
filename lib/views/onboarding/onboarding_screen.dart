@@ -25,56 +25,50 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // ── Contractor onboarding content ──────────────────────────────────────────
   static const _contractorPages = [
     _OnboardingPage(
-      icon: CupertinoIcons.search,
       accentColor: AppColors.contractorAccent,
-      title: 'Find trusted\nprofessionals',
+      title: 'Encuentra profesionales\nconfiables',
       body:
-          'Browse verified taskers in your area. Filter by skill, rating, and portfolio — hire with confidence.',
-      illustrationEmoji: '🔍',
+          'Busca entre multiples trabajadores verificados en tu área. Lee reseñas, compara perfiles y elige al mejor para tu trabajo.',
+      imagePath: 'assets/images/onboard-contratist-1.png',
     ),
     _OnboardingPage(
-      icon: CupertinoIcons.doc_text_fill,
       accentColor: AppColors.contractorAccent,
-      title: 'Post your\ntask in seconds',
+      title: 'Publica tu\ntrabajo en segundos',
       body:
-          'Describe what you need, set your budget, and let taskers come to you. No hassle, no middlemen.',
-      illustrationEmoji: '📋',
+          'Escribe lo que necesitas, establece tu presupuesto y deja que los trabajadores vengan a ti. Sin complicaciones, sin intermediarios.',
+      imagePath: 'assets/images/onboard-contratist-2.png',
     ),
     _OnboardingPage(
-      icon: CupertinoIcons.checkmark_seal_fill,
       accentColor: AppColors.contractorAccent,
-      title: 'Pay only when\nyou\'re happy',
+      title: 'Paga sólo cuando el trabajo esté hecho',
       body:
-          'Chat directly with taskers, agree on terms, and release payment once the job is done right.',
-      illustrationEmoji: '✅',
+          'Confía en nuestro sistema de pago seguro. Paga a los trabajadores sólo cuando estés satisfecho con el trabajo realizado.',
+      imagePath: 'assets/images/onboard-contratist-3.png',
     ),
   ];
 
   // ── Tasker onboarding content ──────────────────────────────────────────────
   static const _taskerPages = [
     _OnboardingPage(
-      icon: CupertinoIcons.person_crop_circle_badge_plus,
       accentColor: AppColors.taskerAccent,
-      title: 'Build your\nprofessional profile',
+      title: 'Crea tu\nperfil profesional',
       body:
-          'Showcase your skills, experience, and portfolio. A great profile gets you hired faster.',
-      illustrationEmoji: '👤',
+          'Muestra tus habilidades, experiencia y portafolio. Un buen perfil te ayuda a conseguir más trabajo.',
+      imagePath: 'assets/images/onboard-tasker-1.png',
     ),
     _OnboardingPage(
-      icon: CupertinoIcons.map_fill,
       accentColor: AppColors.taskerAccent,
-      title: 'Find jobs\nnear you',
+      title: 'Encuentra trabajos\ncerca de ti',
       body:
-          'Browse local tasks that match your skills. Filter by category, pay rate, and distance.',
-      illustrationEmoji: '📍',
+          'Explora tareas locales que se ajusten a tus habilidades. Filtra por categoría, pago y distancia.',
+      imagePath: 'assets/images/onboard-tasker-2.png',
     ),
     _OnboardingPage(
-      icon: CupertinoIcons.money_dollar_circle_fill,
       accentColor: AppColors.taskerAccent,
-      title: 'Earn on\nyour schedule',
+      title: 'Trabaja cuando\nquieras',
       body:
-          'Accept tasks when it works for you. Get paid fast, build reviews, and grow your reputation.',
-      illustrationEmoji: '💰',
+          'Acepta trabajos a tu ritmo. Cobra rápido, acumula reseñas y haz crecer tu reputación.',
+      imagePath: 'assets/images/onboard-tasker-3.png',
     ),
   ];
 
@@ -146,7 +140,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     padding: EdgeInsets.zero,
                     onPressed: () => context.push(AppRoutes.login),
                     child: Text(
-                      'Skip',
+                      'Omitir',
                       style: AppTextStyles.caption.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -173,7 +167,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Column(
                 children: [
                   AppPrimaryButton(
-                    label: isLast ? 'Get Started' : 'Continue',
+                    label: isLast ? 'Comenzar' : 'Continuar',
                     color: accentColor,
                     onPressed: _nextPage,
                   ),
@@ -183,7 +177,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       padding: EdgeInsets.zero,
                       onPressed: () => context.push(AppRoutes.login),
                       child: Text(
-                        'Already have an account? Log in',
+                        '¿Ya tienes una cuenta? Inicia sesión',
                         style: AppTextStyles.caption.copyWith(
                           color: AppColors.accent,
                         ),
@@ -203,18 +197,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 // ─── Individual onboarding page data ─────────────────────────────────────────
 
 class _OnboardingPage {
-  final IconData icon;
   final Color accentColor;
   final String title;
   final String body;
-  final String illustrationEmoji;
+  final String imagePath;
 
   const _OnboardingPage({
-    required this.icon,
     required this.accentColor,
     required this.title,
     required this.body,
-    required this.illustrationEmoji,
+    required this.imagePath,
   });
 }
 
@@ -234,36 +226,12 @@ class _OnboardingPageView extends StatelessWidget {
         children: [
           const SizedBox(height: AppSpacing.xl),
 
-          // Large illustration area
-          Container(
+          // Illustration image
+          Image.asset(
+            page.imagePath,
             width: double.infinity,
-            height: 260,
-            decoration: BoxDecoration(
-              color: page.accentColor.withOpacity(0.06),
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-              border: Border.all(color: page.accentColor.withOpacity(0.12)),
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Background icon (large, faded)
-                Icon(
-                  page.icon,
-                  size: 140,
-                  color: page.accentColor.withOpacity(0.08),
-                ),
-                // Foreground icon
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: page.accentColor.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                  ),
-                  child: Icon(page.icon, size: 38, color: page.accentColor),
-                ),
-              ],
-            ),
+            height: 300,
+            fit: BoxFit.contain,
           ),
 
           const SizedBox(height: AppSpacing.xl),

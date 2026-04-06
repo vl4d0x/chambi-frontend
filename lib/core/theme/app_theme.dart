@@ -8,16 +8,23 @@ class AppColors {
   static const Color accentLight = Color(0xFF1E9AF0);
   static const Color accentDark = Color(0xFF0D5FA0);
 
-  // Backgrounds
-  static const Color background = Color(0xFF0A0A0A);
-  static const Color surface = Color(0xFF141414);
-  static const Color surfaceElevated = Color(0xFF1C1C1C);
-  static const Color surfaceHighlight = Color(0xFF242424);
+  // Backgrounds - Light Mode
+  static const Color background =
+      Color(0xFFF8F9FA); // Very light grey (easier on eyes than pure white)
+  static const Color surface =
+      Color(0xFFFFFFFF); // Pure white for cards/content
+  static const Color surfaceElevated =
+      Color(0xFFF1F3F4); // Subtle grey for hover states or secondary sections
+  static const Color surfaceHighlight =
+      Color(0xFFE8EAED); // Slightly darker for borders or active states
 
-  // Text
-  static const Color textPrimary = Color(0xFFF5F5F5);
-  static const Color textSecondary = Color(0xFF9A9A9A);
-  static const Color textTertiary = Color(0xFF5A5A5A);
+  // Text - Light Mode
+  static const Color textPrimary =
+      Color(0xFF1A1A1B); // Deep charcoal for headings and body
+  static const Color textSecondary =
+      Color(0xFF5F6368); // Medium gray for subheaders and labels
+  static const Color textTertiary =
+      Color(0xFF80868B); // Lighter gray for captions and disabled hints
 
   // Semantic
   static const Color success = Color(0xFF30D158);
@@ -29,7 +36,7 @@ class AppColors {
 
   // Role colors
   static const Color contractorAccent = Color(0xFF127DCE); // blue
-  static const Color taskerAccent = Color(0xFF30D158);     // green
+  static const Color taskerAccent = Color(0xFF30D158); // green
 }
 
 class AppTextStyles {

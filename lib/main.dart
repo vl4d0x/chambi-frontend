@@ -42,7 +42,7 @@ class _AppWithRouterState extends State<_AppWithRouter> {
   @override
   Widget build(BuildContext context) {
     return CupertinoApp.router(
-      title: 'Taskr',
+      title: 'Chambi',
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
       theme: const CupertinoThemeData(

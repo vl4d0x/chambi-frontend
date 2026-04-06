@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/router/app_router.dart';
@@ -28,13 +29,24 @@ class RoleSelectorScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.xxl),
 
               // Headline
-              const Text(
-                'How will\nyou use\nTaskr?',
-                style: AppTextStyles.display,
+              Text.rich(
+                TextSpan(
+                  style: AppTextStyles.display,
+                  children: [
+                    const TextSpan(text: '¿Cómo te gustaría usar '),
+                    TextSpan(
+                      text: 'chambi',
+                      style: AppTextStyles.display.copyWith(
+                        fontFamily: 'Lexend',
+                      ),
+                    ),
+                    const TextSpan(text: '?'),
+                  ],
+                ),
               ),
               const SizedBox(height: AppSpacing.sm),
               const Text(
-                'You can always switch later.',
+                'chambi es una plataforma que conecta profesionales con clientes.',
                 style: AppTextStyles.bodySecondary,
               ),
 
@@ -43,16 +55,17 @@ class RoleSelectorScreen extends StatelessWidget {
               // Role cards
               const _RoleCard(
                 role: UserRole.contractor,
-                title: 'I need tasks done',
-                subtitle: 'Post jobs and find trusted taskers nearby',
+                title: 'Busco ayuda profesional',
+                subtitle:
+                    'Publica trabajos y encuentra trabajadores confiables cerca de ti',
                 icon: CupertinoIcons.briefcase_fill,
                 accentColor: AppColors.contractorAccent,
               ),
               const SizedBox(height: AppSpacing.md),
               const _RoleCard(
                 role: UserRole.tasker,
-                title: 'I want to work',
-                subtitle: 'Browse jobs and grow your client base',
+                title: 'Quiero trabajar',
+                subtitle: 'Explora trabajos y expande tu base de clientes',
                 icon: CupertinoIcons.hammer_fill,
                 accentColor: AppColors.taskerAccent,
               ),
@@ -65,7 +78,7 @@ class RoleSelectorScreen extends StatelessWidget {
                   padding: EdgeInsets.zero,
                   onPressed: () => context.push(AppRoutes.login),
                   child: Text(
-                    'Already have an account? Log in',
+                    '¿Ya tienes una cuenta? Inicia sesión',
                     style: AppTextStyles.caption.copyWith(
                       color: AppColors.accent,
                     ),
@@ -84,24 +97,17 @@ class RoleSelectorScreen extends StatelessWidget {
   Widget _buildLogo() {
     return Row(
       children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: AppColors.accent,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: const Icon(
-            CupertinoIcons.bolt_fill,
-            color: CupertinoColors.white,
-            size: 20,
-          ),
+        SvgPicture.asset(
+          'assets/icons/logo.svg',
+          width: 30,
+          height: 30,
         ),
         const SizedBox(width: 10),
         Text(
-          'Taskr',
+          'chambi',
           style: AppTextStyles.title.copyWith(
-            fontSize: 22,
+            fontSize: 30,
+            fontFamily: 'Lexend',
             letterSpacing: -0.5,
           ),
         ),

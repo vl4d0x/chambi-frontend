@@ -1,4 +1,4 @@
-import 'package:chambi_frontend/views/auth/contractor_register_screen.dart';
+import 'package:chambi_frontend/views/auth/contractor/contractor_register_screen.dart';
 import 'package:chambi_frontend/views/tasker/tasker_register_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
@@ -34,7 +34,8 @@ GoRouter createRouter(AuthViewModel authViewModel) {
     debugLogDiagnostics: true,
     refreshListenable: authViewModel,
 
-    // TODO(backend): Update redirect logic when real auth persistence is added.
+    // TODO(backend): Update redirect logic whien real auth persistence is added.
+
     // Check FirebaseAuth.instance.currentUser and redirect accordingly.
     redirect: (context, state) {
       final isAuthenticated = authViewModel.isAuthenticated;

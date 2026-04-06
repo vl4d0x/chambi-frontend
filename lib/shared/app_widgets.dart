@@ -1,5 +1,6 @@
 import 'package:chambi_frontend/core/theme/app_theme.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 // ─── Primary Button ───────────────────────────────────────────────────────────
 
@@ -193,28 +194,14 @@ class GoogleSignInButton extends StatelessWidget {
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Simple G logo via text (replace with SVG asset later)
-                  Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceHighlight,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'G',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.accent,
-                        ),
-                      ),
-                    ),
+                  const FaIcon(
+                    FontAwesomeIcons.google,
+                    size: 20,
+                    color: Color(0xFF4285F4),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   Text(
-                    'Continue with Google',
+                    'Continuar con Google',
                     style: AppTextStyles.body.copyWith(
                       fontWeight: FontWeight.w500,
                       color: AppColors.textPrimary,
@@ -327,3 +314,4 @@ class SkillChip extends StatelessWidget {
     );
   }
 }
+

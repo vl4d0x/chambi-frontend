@@ -73,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
     showCupertinoDialog(
       context: context,
       builder: (_) => CupertinoAlertDialog(
-        title: const Text('Login failed'),
+        title: const Text('Inicio de sesión fallido'),
         content: Text(message),
         actions: [
           CupertinoDialogAction(
@@ -120,7 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
               // Role badge
               if (role != null)
                 RoleBadge(
-                  label: role == UserRole.contractor ? 'Contractor' : 'Tasker',
+                  label: role == UserRole.contractor
+                      ? 'Contratista'
+                      : 'Trabajador',
                   color: role == UserRole.contractor
                       ? AppColors.contractorAccent
                       : AppColors.taskerAccent,
@@ -128,10 +130,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: AppSpacing.md),
 
-              const Text('Welcome\nback.', style: AppTextStyles.headline),
+              const Text('Bienvenido\na chambi',
+                  style: TextStyle(
+                      fontFamily: '.SF Pro Display',
+                      fontSize: 36,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      letterSpacing: -0.8,
+                      height: 1.2)),
               const SizedBox(height: AppSpacing.sm),
               const Text(
-                'Sign in to your account to continue.',
+                'Inicia sesión en tu cuenta para continuar.',
                 style: AppTextStyles.bodySecondary,
               ),
 
@@ -140,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
               // Email field
               AppTextField(
                 label: 'EMAIL',
-                placeholder: 'you@example.com',
+                placeholder: 'tuemail@ejemplo.com',
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
@@ -150,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               // Password field
               AppTextField(
-                label: 'PASSWORD',
+                label: 'CONTRASEÑA',
                 placeholder: '••••••••',
                 controller: _passwordController,
                 obscureText: _obscurePassword,
@@ -181,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // TODO(backend): Implement forgot password with FirebaseAuth.sendPasswordResetEmail()
                   onPressed: () {},
                   child: Text(
-                    'Forgot password?',
+                    '¿Olvidaste tu contraseña?',
                     style: AppTextStyles.caption.copyWith(
                       color: AppColors.accent,
                     ),
@@ -208,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
                     child: Text(
-                      'or',
+                      'o',
                       style: AppTextStyles.caption,
                     ),
                   ),
@@ -231,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'Don\'t have an account?',
+                      '¿No tienes una cuenta?',
                       style: AppTextStyles.caption,
                     ),
                     SizedBox(height: AppSpacing.sm),
@@ -239,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _RegisterLink(
-                          label: 'Join as Contractor',
+                          label: 'Unirse como Contratista',
                           route: AppRoutes.contractorRegister,
                           color: AppColors.contractorAccent,
                         ),
@@ -249,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Text('·', style: AppTextStyles.caption),
                         ),
                         _RegisterLink(
-                          label: 'Join as Tasker',
+                          label: 'Unirse como Trabajador',
                           route: AppRoutes.taskerRegister,
                           color: AppColors.taskerAccent,
                         ),
