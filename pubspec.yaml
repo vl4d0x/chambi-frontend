@@ -22,6 +22,12 @@ dependencies:
   # Image picking (for tasker registration - portfolio, profile photo)
   image_picker: ^1.0.7
 
+  # Location
+  geolocator: ^12.0.0
+
+  # Address autocomplete
+  mapbox_search: ^4.4.0
+
   # Icons
   cupertino_icons: ^1.0.6
   google_fonts: ^8.0.2

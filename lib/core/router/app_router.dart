@@ -9,10 +9,6 @@ import '../../../../models/user_model.dart';
 import '../../../../views/onboarding/role_selector_screen.dart';
 import '../../../../views/onboarding/onboarding_screen.dart';
 import '../../../../views/auth/login_screen.dart';
-import '../../../../views/auth/contractor/contractor_register_screen.dart';
-import '../../../../views/auth/tasker/tasker_register_screen.dart';
-import '../../../../views/contractor/contractor_shell.dart';
-import '../../../../views/tasker/tasker_shell.dart';
 
 // ─── Route Names ──────────────────────────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../../models/user_model.dart';
+import '../models/user_model.dart';
 
 class AuthViewModel extends ChangeNotifier {
   UserRole? _selectedRole;
@@ -23,8 +23,6 @@ class AuthViewModel extends ChangeNotifier {
   // ─── Login ─────────────────────────────────────────────────────────────────
 
   /// TODO(backend): Replace with real Firebase Auth email/password sign-in.
-  /// Call: FirebaseAuth.instance.signInWithEmailAndPassword(email, password)
-  /// Then fetch user document from Firestore to populate UserModel.
   Future<bool> loginWithEmail({
     required String email,
     required String password,
@@ -32,16 +30,15 @@ class AuthViewModel extends ChangeNotifier {
     _setLoading(true);
     _clearError();
 
-    await Future.delayed(const Duration(milliseconds: 800)); // mock delay
+    await Future.delayed(const Duration(milliseconds: 800));
 
-    // Mock validation – remove when backend is connected
     if (email.isEmpty || password.length < 6) {
       _errorMessage = 'Please enter a valid email and password.';
       _setLoading(false);
       return false;
     }
 
-    // TODO(backend): Remove mock user. Fetch real user from Firestore after auth.
+    // TODO(backend): Remove mock user.
     _currentUser = UserModel(
       id: 'mock-uid-001',
       name: 'Alex Johnson',
@@ -54,16 +51,13 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   /// TODO(backend): Replace with Firebase Google Sign-In.
-  /// Call: GoogleSignIn().signIn() → GoogleAuthProvider.credential() →
-  /// FirebaseAuth.instance.signInWithCredential(credential)
-  /// Then upsert user document in Firestore.
   Future<bool> loginWithGoogle() async {
     _setLoading(true);
     _clearError();
 
-    await Future.delayed(const Duration(milliseconds: 1000)); // mock delay
+    await Future.delayed(const Duration(milliseconds: 1000));
 
-    // TODO(backend): Remove mock user. Populate from Google account + Firestore.
+    // TODO(backend): Remove mock user.
     _currentUser = UserModel(
       id: 'mock-google-uid-001',
       name: 'Alex Johnson',
@@ -78,16 +72,16 @@ class AuthViewModel extends ChangeNotifier {
   // ─── Contractor Registration ───────────────────────────────────────────────
 
   /// TODO(backend): Replace with Firebase Auth createUserWithEmailAndPassword,
-  /// then write a Firestore document to /users/{uid} with role: 'contractor'
-  /// and address fields.
+  /// then write a Firestore/REST document with role: 'contractor' and location fields.
+  /// Location: send location.toJson() — backend stores latitude/longitude as doubles
+  /// and addressType as string. Future migration to PostGIS is additive only.
   Future<bool> registerContractor({
     required String name,
     required String email,
     required String password,
-    required String address,
-    required String city,
-    required String zipCode,
     required String phone,
+    AddressModel? location,
+    bool isGooglePath = false,
   }) async {
     _setLoading(true);
     _clearError();
@@ -100,9 +94,8 @@ class AuthViewModel extends ChangeNotifier {
       name: name,
       email: email,
       role: UserRole.contractor,
-      address: address,
-      city: city,
-      zipCode: zipCode,
+      phone: phone,
+      location: location,
     );
 
     _setLoading(false);
@@ -112,18 +105,17 @@ class AuthViewModel extends ChangeNotifier {
   // ─── Tasker Registration ───────────────────────────────────────────────────
 
   /// TODO(backend): Replace with Firebase Auth createUserWithEmailAndPassword,
-  /// then upload avatar and portfolio images to Firebase Storage,
-  /// then write a Firestore document to /users/{uid} with role: 'tasker',
-  /// skills, bio, and the Storage download URLs for images.
+  /// upload avatar and portfolio images to Firebase Storage,
+  /// then write a REST document with role: 'tasker' and location + image URLs.
   Future<bool> registerTasker({
     required String name,
     required String email,
     required String password,
-    required List<String> skills,
-    required String bio,
-    // TODO(backend): Change these to List<File> or List<XFile> for real upload
-    required List<String> portfolioImagePaths,
-    required String? avatarImagePath,
+    required String phone,
+    AddressModel? location,
+    String? profilePhotoPath,
+    List<String> portfolioPhotoPaths = const [],
+    bool isGooglePath = false,
   }) async {
     _setLoading(true);
     _clearError();
@@ -136,8 +128,8 @@ class AuthViewModel extends ChangeNotifier {
       name: name,
       email: email,
       role: UserRole.tasker,
-      skills: skills,
-      bio: bio,
+      phone: phone,
+      location: location,
     );
 
     _setLoading(false);

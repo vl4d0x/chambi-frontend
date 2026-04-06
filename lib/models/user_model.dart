@@ -1,3 +1,7 @@
+import 'address_model.dart';
+
+export 'address_model.dart';
+
 enum UserRole { contractor, tasker }
 
 enum AuthStatus { unauthenticated, authenticated }
@@ -8,11 +12,10 @@ class UserModel {
   final String email;
   final UserRole role;
   final String? avatarUrl;
+  final String? phone;
 
-  // Contractor-specific
-  final String? address;
-  final String? city;
-  final String? zipCode;
+  // Shared location
+  final AddressModel? location;
 
   // Tasker-specific
   final List<String> skills;
@@ -27,9 +30,8 @@ class UserModel {
     required this.email,
     required this.role,
     this.avatarUrl,
-    this.address,
-    this.city,
-    this.zipCode,
+    this.phone,
+    this.location,
     this.skills = const [],
     this.bio,
     this.portfolioUrls = const [],
@@ -40,9 +42,8 @@ class UserModel {
   UserModel copyWith({
     String? name,
     String? avatarUrl,
-    String? address,
-    String? city,
-    String? zipCode,
+    String? phone,
+    AddressModel? location,
     List<String>? skills,
     String? bio,
     List<String>? portfolioUrls,
@@ -53,9 +54,8 @@ class UserModel {
       email: email,
       role: role,
       avatarUrl: avatarUrl ?? this.avatarUrl,
-      address: address ?? this.address,
-      city: city ?? this.city,
-      zipCode: zipCode ?? this.zipCode,
+      phone: phone ?? this.phone,
+      location: location ?? this.location,
       skills: skills ?? this.skills,
       bio: bio ?? this.bio,
       portfolioUrls: portfolioUrls ?? this.portfolioUrls,

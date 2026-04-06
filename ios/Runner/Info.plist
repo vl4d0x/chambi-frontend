@@ -47,6 +47,14 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Chambi uses your location to find nearby professionals and services.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Chambi uses your location to find nearby professionals and services.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Chambi needs access to your photo library to upload profile and portfolio photos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Chambi needs camera access to take your profile photo.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
