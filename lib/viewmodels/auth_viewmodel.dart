@@ -1,17 +1,25 @@
 import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
+import '../models/contractor_model.dart';
+import '../models/tasker_model.dart';
 
 class AuthViewModel extends ChangeNotifier {
   UserRole? _selectedRole;
-  UserModel? _currentUser;
+  AppUser? _currentUser;
   bool _isLoading = false;
   String? _errorMessage;
 
   UserRole? get selectedRole => _selectedRole;
-  UserModel? get currentUser => _currentUser;
+  AppUser? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _currentUser != null;
+
+  // Typed getters — null if the current user is not that role
+  ContractorModel? get currentContractor =>
+      _currentUser is ContractorModel ? _currentUser as ContractorModel : null;
+  TaskerModel? get currentTasker =>
+      _currentUser is TaskerModel ? _currentUser as TaskerModel : null;
 
   // ─── Role Selection ────────────────────────────────────────────────────────
 
@@ -39,7 +47,7 @@ class AuthViewModel extends ChangeNotifier {
     }
 
     // TODO(backend): Remove mock user.
-    _currentUser = UserModel(
+    _currentUser = _mockUserForRole(
       id: 'mock-uid-001',
       name: 'Alex Johnson',
       email: email,
@@ -58,7 +66,7 @@ class AuthViewModel extends ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 1000));
 
     // TODO(backend): Remove mock user.
-    _currentUser = UserModel(
+    _currentUser = _mockUserForRole(
       id: 'mock-google-uid-001',
       name: 'Alex Johnson',
       email: 'alex@gmail.com',
@@ -71,10 +79,9 @@ class AuthViewModel extends ChangeNotifier {
 
   // ─── Contractor Registration ───────────────────────────────────────────────
 
-  /// TODO(backend): Replace with Firebase Auth createUserWithEmailAndPassword,
-  /// then write a Firestore/REST document with role: 'contractor' and location fields.
-  /// Location: send location.toJson() — backend stores latitude/longitude as doubles
-  /// and addressType as string. Future migration to PostGIS is additive only.
+  /// TODO(backend): Replace with real REST call to POST /api/contractors.
+  /// Send ContractorModel fields as JSON; backend stores lat/lng as doubles
+  /// (PostGIS migration is additive — no contract change needed).
   Future<bool> registerContractor({
     required String name,
     required String email,
@@ -89,11 +96,10 @@ class AuthViewModel extends ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 1000));
 
     // TODO(backend): Remove mock user.
-    _currentUser = UserModel(
+    _currentUser = ContractorModel(
       id: 'mock-contractor-001',
       name: name,
       email: email,
-      role: UserRole.contractor,
       phone: phone,
       location: location,
     );
@@ -104,9 +110,9 @@ class AuthViewModel extends ChangeNotifier {
 
   // ─── Tasker Registration ───────────────────────────────────────────────────
 
-  /// TODO(backend): Replace with Firebase Auth createUserWithEmailAndPassword,
-  /// upload avatar and portfolio images to Firebase Storage,
-  /// then write a REST document with role: 'tasker' and location + image URLs.
+  /// TODO(backend): Replace with real REST call to POST /api/taskers.
+  /// Upload avatar and portfolio images first, then send TaskerModel fields
+  /// including image URLs and location.toJson().
   Future<bool> registerTasker({
     required String name,
     required String email,
@@ -123,11 +129,10 @@ class AuthViewModel extends ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 1200));
 
     // TODO(backend): Remove mock user.
-    _currentUser = UserModel(
+    _currentUser = TaskerModel(
       id: 'mock-tasker-001',
       name: name,
       email: email,
-      role: UserRole.tasker,
       phone: phone,
       location: location,
     );
@@ -146,6 +151,17 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
+
+  AppUser _mockUserForRole({
+    required String id,
+    required String name,
+    required String email,
+    required UserRole role,
+  }) {
+    return role == UserRole.tasker
+        ? TaskerModel(id: id, name: name, email: email)
+        : ContractorModel(id: id, name: name, email: email);
+  }
 
   void _setLoading(bool value) {
     _isLoading = value;
