@@ -102,6 +102,7 @@ class AuthViewModel extends ChangeNotifier {
       email: email,
       phone: phone,
       location: location,
+      password: isGooglePath ? null : password,
     );
 
     _setLoading(false);
@@ -135,6 +136,7 @@ class AuthViewModel extends ChangeNotifier {
       email: email,
       phone: phone,
       location: location,
+      password: isGooglePath ? null : password,
     );
 
     _setLoading(false);

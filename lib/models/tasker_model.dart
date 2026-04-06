@@ -1,6 +1,10 @@
 import 'user_model.dart';
 
 class TaskerModel extends AppUser {
+  /// Only populated on the create path (registration).
+  /// Never received from the backend — always null after a fetch.
+  final String? password;
+
   final List<String> skills;
   final String? bio;
   final List<String> portfolioUrls;
@@ -14,6 +18,7 @@ class TaskerModel extends AppUser {
     super.avatarUrl,
     super.phone,
     super.location,
+    this.password,
     this.skills = const [],
     this.bio,
     this.portfolioUrls = const [],

@@ -1,6 +1,10 @@
 import 'user_model.dart';
 
 class ContractorModel extends AppUser {
+  /// Only populated on the create path (registration).
+  /// Never received from the backend — always null after a fetch.
+  final String? password;
+
   const ContractorModel({
     required super.id,
     required super.name,
@@ -8,6 +12,7 @@ class ContractorModel extends AppUser {
     super.avatarUrl,
     super.phone,
     super.location,
+    this.password,
   });
 
   @override
