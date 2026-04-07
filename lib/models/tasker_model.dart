@@ -5,6 +5,9 @@ class TaskerModel extends AppUser {
   /// Never received from the backend — always null after a fetch.
   final String? password;
 
+  /// A tasker has a single primary location.
+  final AddressModel? location;
+
   final List<String> skills;
   final String? bio;
   final List<String> portfolioUrls;
@@ -17,8 +20,8 @@ class TaskerModel extends AppUser {
     required super.email,
     super.avatarUrl,
     super.phone,
-    super.location,
     this.password,
+    this.location,
     this.skills = const [],
     this.bio,
     this.portfolioUrls = const [],

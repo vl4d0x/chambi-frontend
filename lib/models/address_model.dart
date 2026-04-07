@@ -16,6 +16,8 @@ extension AddressTypeLabel on AddressType {
 }
 
 class AddressModel {
+  /// Human-readable label chosen by the user (e.g. "Home", "Grandma's house").
+  final String name;
   final String formattedAddress;
   final double latitude;
   final double longitude;
@@ -27,6 +29,7 @@ class AddressModel {
   final String? country;
 
   const AddressModel({
+    required this.name,
     required this.formattedAddress,
     required this.latitude,
     required this.longitude,
@@ -38,8 +41,9 @@ class AddressModel {
     this.country,
   });
 
-  AddressModel copyWith({AddressType? type}) {
+  AddressModel copyWith({String? name, AddressType? type}) {
     return AddressModel(
+      name: name ?? this.name,
       formattedAddress: formattedAddress,
       latitude: latitude,
       longitude: longitude,
@@ -55,6 +59,7 @@ class AddressModel {
   /// Serialized for sending to the Spring REST backend.
   /// Store latitude/longitude as plain doubles — ready for PostGIS migration later.
   Map<String, dynamic> toJson() => {
+        'name': name,
         'formattedAddress': formattedAddress,
         'latitude': latitude,
         'longitude': longitude,

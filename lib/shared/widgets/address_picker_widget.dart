@@ -8,6 +8,19 @@ import '../../core/constants/api_keys.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/address_model.dart';
 
+/// Intermediate state for a location before the user has named it.
+class _PendingLocation {
+  final String formattedAddress;
+  final double latitude;
+  final double longitude;
+
+  const _PendingLocation({
+    required this.formattedAddress,
+    required this.latitude,
+    required this.longitude,
+  });
+}
+
 class AddressPickerWidget extends StatefulWidget {
   final AddressModel? currentAddress;
   final ValueChanged<AddressModel> onAddressChanged;
@@ -36,26 +49,87 @@ class _AddressPickerWidgetState extends State<AddressPickerWidget> {
   bool _isSearching = false;
   Timer? _debounce;
 
-  // Selected address (local copy, synced with parent)
+  // Name field — shown once a location is picked
+  final _nameController = TextEditingController();
+
+  // Pending: coordinates picked but not yet named
+  _PendingLocation? _pending;
+
+  // Fully built address (pending + name + type)
   AddressModel? _address;
+  AddressType _selectedType = AddressType.house;
 
   late final GeoCodingApi _geoCoding;
 
   @override
   void initState() {
     super.initState();
-    _address = widget.currentAddress;
-    _geoCoding = GeoCodingApi(
-      apiKey: ApiKeys.mapboxPublicToken,
-      limit: 5,
-    );
+    if (widget.currentAddress != null) {
+      final a = widget.currentAddress!;
+      _address = a;
+      _selectedType = a.type;
+      _nameController.text = a.name;
+      _pending = _PendingLocation(
+        formattedAddress: a.formattedAddress,
+        latitude: a.latitude,
+        longitude: a.longitude,
+      );
+      _searchController.text = a.formattedAddress;
+    }
+    _geoCoding = GeoCodingApi(apiKey: ApiKeys.mapboxPublicToken, limit: 5);
+    _nameController.addListener(_onNameChanged);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _nameController.dispose();
     _debounce?.cancel();
     super.dispose();
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  /// Rebuilds the full AddressModel and notifies parent whenever name or type
+  /// changes, but only if a location has already been picked.
+  void _onNameChanged() {
+    _rebuildAndNotify();
+  }
+
+  void _rebuildAndNotify() {
+    if (_pending == null) return;
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
+      // Address is incomplete — clear it so the wizard blocks "Continue"
+      if (_address != null) {
+        setState(() => _address = null);
+        // Don't call onAddressChanged with null; VM retains last valid address
+      }
+      return;
+    }
+    final built = AddressModel(
+      name: name,
+      formattedAddress: _pending!.formattedAddress,
+      latitude: _pending!.latitude,
+      longitude: _pending!.longitude,
+      type: _selectedType,
+    );
+    setState(() => _address = built);
+    widget.onAddressChanged(built);
+  }
+
+  void _setPending(_PendingLocation pending) {
+    setState(() {
+      _pending = pending;
+      _address = null; // require name confirmation
+    });
+    // If name is already typed, rebuild immediately
+    _rebuildAndNotify();
+  }
+
+  void _setType(AddressType type) {
+    setState(() => _selectedType = type);
+    _rebuildAndNotify();
   }
 
   // ── GPS ───────────────────────────────────────────────────────────────────
@@ -84,18 +158,16 @@ class _AddressPickerWidgetState extends State<AddressPickerWidget> {
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      // TODO(backend): Replace with Mapbox reverse geocode using GeoCoding.getAddress():
-      // final result = await _geoCoding.getAddress((lat: position.latitude, long: position.longitude));
-      final newAddress = AddressModel(
-        formattedAddress:
-            'Current Location (${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)})',
+      // TODO(backend): Replace with Mapbox reverse geocode using GeoCodingApi.getAddress()
+      final formatted =
+          'Current Location (${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)})';
+
+      _setPending(_PendingLocation(
+        formattedAddress: formatted,
         latitude: position.latitude,
         longitude: position.longitude,
-        type: _address?.type ?? AddressType.house,
-      );
-      setState(() => _address = newAddress);
-      widget.onAddressChanged(newAddress);
-    } catch (e) {
+      ));
+    } catch (_) {
       setState(() => _gpsError = 'Could not get location. Try manual entry.');
     }
 
@@ -107,7 +179,11 @@ class _AddressPickerWidgetState extends State<AddressPickerWidget> {
   void _onSearchChanged(String query) {
     _debounce?.cancel();
     if (query.trim().isEmpty) {
-      setState(() => _searchResults = []);
+      setState(() {
+        _searchResults = [];
+        _pending = null;
+        _address = null;
+      });
       return;
     }
     _debounce = Timer(const Duration(milliseconds: 400), () => _search(query));
@@ -115,43 +191,27 @@ class _AddressPickerWidgetState extends State<AddressPickerWidget> {
 
   Future<void> _search(String query) async {
     setState(() => _isSearching = true);
-
     try {
-      // ApiResponse<List<MapBoxPlace>> — ({List<MapBoxPlace>? success, FailureResponse? failure})
       final response = await _geoCoding.getPlaces(query);
       setState(() => _searchResults = response.success ?? []);
     } catch (_) {
       setState(() => _searchResults = []);
     }
-
     setState(() => _isSearching = false);
   }
 
   void _selectPlace(MapBoxPlace place) {
-    // Location is a record type: ({double long, double lat})
     final lat = place.center?.lat ?? 0.0;
     final lng = place.center?.long ?? 0.0;
-    final newAddress = AddressModel(
-      formattedAddress: place.placeName ?? 'Unknown address',
-      latitude: lat,
-      longitude: lng,
-      type: _address?.type ?? AddressType.house,
-    );
     setState(() {
-      _address = newAddress;
       _searchResults = [];
       _searchController.text = place.placeName ?? '';
     });
-    widget.onAddressChanged(newAddress);
-  }
-
-  // ── Address type update ───────────────────────────────────────────────────
-
-  void _setAddressType(AddressType type) {
-    if (_address == null) return;
-    final updated = _address!.copyWith(type: type);
-    setState(() => _address = updated);
-    widget.onAddressChanged(updated);
+    _setPending(_PendingLocation(
+      formattedAddress: place.placeName ?? 'Unknown address',
+      latitude: lat,
+      longitude: lng,
+    ));
   }
 
   // ── Build ─────────────────────────────────────────────────────────────────
@@ -189,56 +249,14 @@ class _AddressPickerWidgetState extends State<AddressPickerWidget> {
 
         const SizedBox(height: AppSpacing.lg),
 
-        // Mode content
         if (_mode == 0) _buildGpsSection() else _buildManualSection(),
 
-        // Address type selector (shown once an address is selected)
-        if (_address != null) ...[
+        // Name + type — shown once a location is picked
+        if (_pending != null) ...[
           const SizedBox(height: AppSpacing.lg),
-          Text(
-            'ADDRESS TYPE',
-            style: AppTextStyles.label.copyWith(
-              color: AppColors.textTertiary,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.sm,
-            children: AddressType.values.map((type) {
-              final isSelected = _address?.type == type;
-              return GestureDetector(
-                onTap: () => _setAddressType(type),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.accent
-                        : AppColors.surfaceElevated,
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                    border: Border.all(
-                      color:
-                          isSelected ? AppColors.accent : AppColors.divider,
-                    ),
-                  ),
-                  child: Text(
-                    type.label,
-                    style: AppTextStyles.caption.copyWith(
-                      color: isSelected
-                          ? CupertinoColors.white
-                          : AppColors.textSecondary,
-                      fontWeight: isSelected
-                          ? FontWeight.w600
-                          : FontWeight.w400,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
+          _buildNameField(),
+          const SizedBox(height: AppSpacing.lg),
+          _buildTypeSelector(),
         ],
       ],
     );
@@ -277,14 +295,12 @@ class _AddressPickerWidgetState extends State<AddressPickerWidget> {
         ),
         if (_gpsError != null) ...[
           const SizedBox(height: AppSpacing.sm),
-          Text(
-            _gpsError!,
-            style: AppTextStyles.caption.copyWith(color: AppColors.error),
-          ),
+          Text(_gpsError!,
+              style: AppTextStyles.caption.copyWith(color: AppColors.error)),
         ],
-        if (_address != null && !_isLoadingGps && _gpsError == null) ...[
+        if (_pending != null && !_isLoadingGps && _gpsError == null) ...[
           const SizedBox(height: AppSpacing.md),
-          _AddressDisplay(address: _address!),
+          _AddressDisplay(formattedAddress: _pending!.formattedAddress),
         ],
       ],
     );
@@ -353,9 +369,7 @@ class _AddressPickerWidgetState extends State<AddressPickerWidget> {
                             child: Text(
                               place.placeName ?? '',
                               style: AppTextStyles.body.copyWith(
-                                fontSize: 14,
-                                color: AppColors.textPrimary,
-                              ),
+                                  fontSize: 14, color: AppColors.textPrimary),
                               maxLines: 2,
                             ),
                           ),
@@ -371,19 +385,114 @@ class _AddressPickerWidgetState extends State<AddressPickerWidget> {
           ),
         ],
 
-        // Selected address display
-        if (_address != null && _searchResults.isEmpty) ...[
+        if (_pending != null && _searchResults.isEmpty) ...[
           const SizedBox(height: AppSpacing.md),
-          _AddressDisplay(address: _address!),
+          _AddressDisplay(formattedAddress: _pending!.formattedAddress),
         ],
+      ],
+    );
+  }
+
+  Widget _buildNameField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'NOMBRE DE LA UBICACIÓN',
+          style: AppTextStyles.label.copyWith(
+            color: AppColors.textTertiary,
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+            border: Border.all(
+              color: _nameController.text.trim().isEmpty
+                  ? AppColors.divider
+                  : AppColors.accent,
+            ),
+          ),
+          child: CupertinoTextField(
+            controller: _nameController,
+            placeholder: 'e.g. Home, Office, Grandma\'s house',
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md, vertical: 14),
+            decoration: null,
+            placeholderStyle:
+                AppTextStyles.body.copyWith(color: AppColors.textTertiary),
+            style: AppTextStyles.body,
+            textCapitalization: TextCapitalization.sentences,
+            textInputAction: TextInputAction.done,
+            cursorColor: AppColors.accent,
+          ),
+        ),
+        if (_nameController.text.trim().isEmpty) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Required to continue',
+            style: AppTextStyles.caption.copyWith(color: AppColors.error),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildTypeSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'ADDRESS TYPE',
+          style: AppTextStyles.label.copyWith(
+            color: AppColors.textTertiary,
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.sm,
+          children: AddressType.values.map((type) {
+            final isSelected = _selectedType == type;
+            return GestureDetector(
+              onTap: () => _setType(type),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color:
+                      isSelected ? AppColors.accent : AppColors.surfaceElevated,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                  border: Border.all(
+                    color: isSelected ? AppColors.accent : AppColors.divider,
+                  ),
+                ),
+                child: Text(
+                  type.label,
+                  style: AppTextStyles.caption.copyWith(
+                    color: isSelected
+                        ? CupertinoColors.white
+                        : AppColors.textSecondary,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
       ],
     );
   }
 }
 
 class _AddressDisplay extends StatelessWidget {
-  final AddressModel address;
-  const _AddressDisplay({required this.address});
+  final String formattedAddress;
+  const _AddressDisplay({required this.formattedAddress});
 
   @override
   Widget build(BuildContext context) {
@@ -391,9 +500,10 @@ class _AddressDisplay extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.accent.withOpacity(0.06),
+        color: AppColors.accent.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.accent.withOpacity(0.2)),
+        border:
+            Border.all(color: AppColors.accent.withValues(alpha: 0.2)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,11 +513,9 @@ class _AddressDisplay extends StatelessWidget {
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
-              address.formattedAddress,
-              style: AppTextStyles.body.copyWith(
-                fontSize: 14,
-                color: AppColors.textPrimary,
-              ),
+              formattedAddress,
+              style: AppTextStyles.body
+                  .copyWith(fontSize: 14, color: AppColors.textPrimary),
             ),
           ),
         ],

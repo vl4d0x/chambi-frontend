@@ -5,14 +5,18 @@ class ContractorModel extends AppUser {
   /// Never received from the backend — always null after a fetch.
   final String? password;
 
+  /// A contractor may have multiple named locations
+  /// (e.g. "Home", "Main Office", "Grandma's house").
+  final List<AddressModel> locations;
+
   const ContractorModel({
     required super.id,
     required super.name,
     required super.email,
     super.avatarUrl,
     super.phone,
-    super.location,
     this.password,
+    this.locations = const [],
   });
 
   @override
@@ -22,7 +26,7 @@ class ContractorModel extends AppUser {
     String? name,
     String? avatarUrl,
     String? phone,
-    AddressModel? location,
+    List<AddressModel>? locations,
   }) {
     return ContractorModel(
       id: id,
@@ -30,7 +34,7 @@ class ContractorModel extends AppUser {
       email: email,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       phone: phone ?? this.phone,
-      location: location ?? this.location,
+      locations: locations ?? this.locations,
     );
   }
 }

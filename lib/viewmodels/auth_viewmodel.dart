@@ -101,7 +101,7 @@ class AuthViewModel extends ChangeNotifier {
       name: name,
       email: email,
       phone: phone,
-      location: location,
+      locations: location != null ? [location] : [],
       password: isGooglePath ? null : password,
     );
 

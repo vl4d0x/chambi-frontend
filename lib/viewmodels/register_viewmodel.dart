@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../models/user_model.dart';
@@ -65,48 +64,9 @@ class RegisterViewModel extends ChangeNotifier {
 
   // ── Step 2 — Address ──────────────────────────────────────────────────────
 
+  /// Fully built address (name + coords + type). Set by AddressPickerWidget
+  /// only once both the location and the user-provided name are confirmed.
   AddressModel? address;
-  bool isLoadingGps = false;
-  String? gpsError;
-
-  /// Requests device location permission and fetches GPS coordinates.
-  /// Reverse geocoding is mocked — replace with Mapbox reverse geocode API later.
-  Future<void> fetchGpsAddress() async {
-    isLoadingGps = true;
-    gpsError = null;
-    notifyListeners();
-
-    try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.deniedForever ||
-          permission == LocationPermission.denied) {
-        gpsError = 'Location permission denied. Please enter your address manually.';
-        isLoadingGps = false;
-        notifyListeners();
-        return;
-      }
-
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      // TODO(backend): Replace with Mapbox reverse geocode API call:
-      // GET https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=...
-      address = AddressModel(
-        formattedAddress: 'Current Location (${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)})',
-        latitude: position.latitude,
-        longitude: position.longitude,
-      );
-    } catch (e) {
-      gpsError = 'Could not get location. Please enter your address manually.';
-    }
-
-    isLoadingGps = false;
-    notifyListeners();
-  }
 
   void setAddress(AddressModel a) {
     address = a;
@@ -176,7 +136,7 @@ class RegisterViewModel extends ChangeNotifier {
         if (phone.trim().isEmpty) return 'Please enter your phone number.';
         return null;
       case 2:
-        if (address == null) return 'Please provide your address.';
+        if (address == null) return 'Please select an address and give it a name.';
         return null;
       default:
         // Photo steps (3, 4) are optional
