@@ -1,6 +1,5 @@
 import 'package:chambi_frontend/views/auth/contractor/contractor_register_screen.dart';
 import 'package:chambi_frontend/views/tasker/tasker_register_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +8,8 @@ import '../../../../models/user_model.dart';
 import '../../../../views/onboarding/role_selector_screen.dart';
 import '../../../../views/onboarding/onboarding_screen.dart';
 import '../../../../views/auth/login_screen.dart';
+import '../../../../views/contractor/contractor_shell.dart';
+import '../../../../views/tasker/tasker_shell.dart';
 
 // ─── Route Names ──────────────────────────────────────────────────────────────
 
@@ -96,16 +97,14 @@ GoRouter createRouter(AuthViewModel authViewModel) {
       GoRoute(
         path: AppRoutes.contractorHome,
         name: 'contractorHome',
-        builder: (context, state) => const Placeholder(),
-        // TODO: Add nested routes for contractor sub-screens (feed, post, chat, account)
+        builder: (context, state) => const ContractorShell(),
       ),
 
       // ── Tasker route tree ──────────────────────────────────────────────────
       GoRoute(
         path: AppRoutes.taskerHome,
         name: 'taskerHome',
-        builder: (context, state) => const Placeholder(),
-        // TODO: Add nested routes for tasker sub-screens (feed, profile, chat, account)
+        builder: (context, state) => const TaskerShell(),
       ),
     ],
   );

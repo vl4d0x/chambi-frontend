@@ -28,6 +28,9 @@ dependencies:
   # Address autocomplete
   mapbox_search: ^4.4.0
 
+  # Bottom navigation
+  salomon_bottom_bar: ^3.3.2
+
   # Icons
   cupertino_icons: ^1.0.6
   google_fonts: ^8.0.2
