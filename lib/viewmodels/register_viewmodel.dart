@@ -17,8 +17,8 @@ class RegisterViewModel extends ChangeNotifier {
   bool get isGooglePath => _isGooglePath;
 
   /// Contractor: 3 steps (credentials, identity, address)
-  /// Tasker: 5 steps (credentials, identity, address, photo, portfolio)
-  int get totalSteps => role == UserRole.tasker ? 5 : 3;
+  /// Tasker: 4 steps (credentials, identity, address, photo)
+  int get totalSteps => role == UserRole.tasker ? 4 : 3;
 
   // ── Step 0 — Credentials ──────────────────────────────────────────────────
 
@@ -79,23 +79,6 @@ class RegisterViewModel extends ChangeNotifier {
 
   void setProfilePhoto(XFile? file) {
     profilePhoto = file;
-    notifyListeners();
-  }
-
-  // ── Step 4 — Portfolio (tasker only) ──────────────────────────────────────
-
-  List<XFile> portfolioPhotos = [];
-  static const int maxPortfolioPhotos = 10;
-
-  void addPortfolioPhotos(List<XFile> files) {
-    final remaining = maxPortfolioPhotos - portfolioPhotos.length;
-    if (remaining <= 0) return;
-    portfolioPhotos = [...portfolioPhotos, ...files.take(remaining)];
-    notifyListeners();
-  }
-
-  void removePortfolioPhoto(int index) {
-    portfolioPhotos = [...portfolioPhotos]..removeAt(index);
     notifyListeners();
   }
 
@@ -173,7 +156,6 @@ class RegisterViewModel extends ChangeNotifier {
         phone: phone.trim(),
         location: address,
         profilePhotoPath: profilePhoto?.path,
-        portfolioPhotoPaths: portfolioPhotos.map((f) => f.path).toList(),
         isGooglePath: _isGooglePath,
       );
     }

@@ -12,7 +12,6 @@ import 'steps/step0_credentials.dart';
 import 'steps/step1_identity.dart';
 import 'steps/step2_address.dart';
 import 'steps/step3_profile_photo.dart';
-import 'steps/step4_portfolio.dart';
 
 class RegisterWizardScreen extends StatelessWidget {
   final UserRole role;
@@ -204,25 +203,14 @@ class _WizardBodyState extends State<_WizardBody> {
                         horizontal: AppSpacing.lg),
                     child: const Step2Address(),
                   ),
-                  if (widget.role == UserRole.tasker) ...[
+                  if (widget.role == UserRole.tasker)
                     SingleChildScrollView(
                       padding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.lg),
                       child: Step3ProfilePhoto(
-                        onSkip: () {
-                          vm.nextStep();
-                          _animateToPage(vm.currentStep);
-                        },
-                      ),
-                    ),
-                    SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg),
-                      child: Step4Portfolio(
                         onSkip: () => _submit(vm),
                       ),
                     ),
-                  ],
                 ],
               ),
             ),

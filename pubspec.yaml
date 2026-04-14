@@ -48,6 +48,9 @@ flutter:
         - asset: assets/fonts/Lexend-Regular.ttf
         - asset: assets/fonts/Lexend-Bold.ttf
           weight: 700
+    - family: AppleColorEmoji
+      fonts:
+        - asset: assets/fonts/AppleColorEmoji.ttf
 
   assets:
     - assets/icons/logo.svg

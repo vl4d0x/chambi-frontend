@@ -513,7 +513,7 @@ class _AddressDisplay extends StatelessWidget {
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
-              formattedAddress,
+              'Ubicación guardada exitosamente',
               style: AppTextStyles.body
                   .copyWith(fontSize: 14, color: AppColors.textPrimary),
             ),
